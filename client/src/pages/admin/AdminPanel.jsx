@@ -188,7 +188,7 @@ const AdminPanel = () => {
             <Input
               id="managerName"
               label="Full Name"
-_            name="name"
+              name="name"
               value={managerForm.name}
               onChange={handleManagerChange}
               required

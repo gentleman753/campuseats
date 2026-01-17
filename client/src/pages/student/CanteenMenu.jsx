@@ -5,8 +5,10 @@ import { addToCart, clearCart } from '../../store/cartSlice';
 import apiClient from '../../api/apiClient';
 import MenuItemCard from '../../components/student/MenuItemCard';
 import Spinner from '../../components/common/Spinner';
+import PageTransition from '../../components/common/PageTransition';
 import toast from 'react-hot-toast';
-import { ArrowLeft, MapPin } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const CanteenMenu = () => {
   const { id: canteenId } = useParams();
@@ -38,72 +40,102 @@ const CanteenMenu = () => {
   }, [canteenId]);
 
   const handleAddToCart = (item) => {
-    // Check if adding from a *different* canteen
     if (cartCanteen && cartCanteen._id !== canteen._id) {
       if (window.confirm('Your cart contains items from another canteen. Would you like to clear it and add this item?')) {
         dispatch(clearCart());
         dispatch(addToCart({ item, canteenInfo: canteen }));
         toast.success(`${item.name} added to cart!`);
       } else {
-        return; // User cancelled
+        return;
       }
     } else {
-      // If no canteen or same canteen, just add
       dispatch(addToCart({ item, canteenInfo: canteen }));
       toast.success(`${item.name} added to cart!`);
     }
   };
 
   if (loading) {
-    return <Spinner />;
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <Spinner />
+      </div>
+    );
   }
 
   if (!canteen) {
-    return <p className="text-center text-gray-600">Canteen not found.</p>;
+    return <p className="text-center text-gray-600 mt-10">Canteen not found.</p>;
   }
 
   return (
-    <div className="pb-24">
+    <PageTransition className="pb-24">
       <Link
         to="/"
-        className="inline-flex items-center gap-2 text-primary hover:underline mb-4"
+        className="inline-flex items-center gap-2 text-slate-500 hover:text-primary-600 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors mb-6 font-medium"
       >
         <ArrowLeft size={18} />
         Back to Canteens
       </Link>
-      
+
       {/* Canteen Header */}
-      <div className="relative mb-6">
-        <img
-          src={canteen.imageUrl}
-          alt={canteen.name}
-          className="w-full h-48 object-cover rounded-lg"
-        />
-        <div className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent rounded-lg p-4 flex flex-col justify-end">
-          <h1 className="text-3xl font-bold text-white">{canteen.name}</h1>
-          <p className="text-gray-200 flex items-center gap-2">
-            <MapPin size={16} />
-            {canteen.location}
-          </p>
+      <div className="relative mb-10 group rounded-3xl overflow-hidden shadow-xl">
+        <div className="h-64 md:h-80 overflow-hidden">
+          <img
+            src={canteen.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}
+            alt={canteen.name}
+            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-8">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+          >
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 font-display">{canteen.name}</h1>
+            <div className="flex flex-wrap items-center gap-4 text-white/90 text-sm md:text-base font-medium">
+              <span className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full">
+                <MapPin size={16} /> {canteen.location}
+              </span>
+              <span className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full">
+                <Clock size={16} /> Open Now
+              </span>
+              <span className="flex items-center gap-1.5 bg-yellow-500/20 backdrop-blur-md px-3 py-1 rounded-full text-yellow-300 border border-yellow-500/30">
+                <Star size={16} className="fill-yellow-300" /> 4.5 Rating
+              </span>
+            </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Menu Items */}
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Menu</h2>
-      <div className="space-y-4">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-slate-800 font-display">Menu</h2>
+        <div className="flex gap-2">
+          {/* Categories could go here */}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {menuItems.length > 0 ? (
-          menuItems.map((item) => (
-            <MenuItemCard
+          menuItems.map((item, index) => (
+            <motion.div
               key={item._id}
-              item={item}
-              onAddToCart={() => handleAddToCart(item)}
-            />
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <MenuItemCard
+                item={item}
+                onAddToCart={() => handleAddToCart(item)}
+              />
+            </motion.div>
           ))
         ) : (
-          <p className="text-gray-600">This canteen has no items available.</p>
+          <div className="col-span-full text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200">
+            <p className="text-slate-500 text-lg">This canteen has no items available.</p>
+          </div>
         )}
       </div>
-    </div>
+    </PageTransition>
   );
 };
 

@@ -131,11 +131,12 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   }
 
   const updatedOrder = await order.save();
+  const orderItems = await OrderItem.find({ order: updatedOrder._id });
 
   // Removed Socket.io emits
   // Client (student and manager) will poll for updates.
 
-  res.json(updatedOrder);
+  res.json({ ...updatedOrder.toObject(), items: orderItems });
 });
 
 // --- Menu Management ---

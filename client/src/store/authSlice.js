@@ -58,6 +58,9 @@ const authSlice = createSlice({
       state.error = null;
       localStorage.removeItem('campuseats-user');
     },
+    clearError: (state) => {
+      state.error = null;
+    },
     resetAuthStatus: (state) => {
       state.status = 'idle';
       state.error = null;
@@ -94,7 +97,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, resetAuthStatus } = authSlice.actions;
+export const { logout, resetAuthStatus, clearError } = authSlice.actions;
 
 export const selectUser = (state) => state.auth.user;
 

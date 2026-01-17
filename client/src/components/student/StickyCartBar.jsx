@@ -1,45 +1,47 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { ShoppingCart } from 'lucide-react';
-import { selectCartTotal } from '../../store/cartSlice'; // <-- FIX: Import selector
+import { motion, AnimatePresence } from 'framer-motion';
+import { ShoppingBag, ChevronRight } from 'lucide-react';
+import { selectCartTotal } from '../../store/cartSlice';
 
 const StickyCartBar = () => {
-  // <-- FIX: Used correct state property and selector
   const { cartItems } = useSelector((state) => state.cart);
-  const cartTotal = useSelector(selectCartTotal); 
-  // ---
-  
-  const cartCount = cartItems.length;
-
-  if (cartCount === 0) {
-    return null;
-  }
+  const totalAmount = useSelector(selectCartTotal);
+  const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40">
-      <div className="container mx-auto max-w-4xl p-4">
-        <Link
-          to="/cart"
-          className="flex justify-between items-center bg-primary text-white p-4 rounded-lg shadow-xl"
+    <AnimatePresence>
+      {itemCount > 0 && (
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          className="fixed bottom-6 left-0 right-0 px-4 z-40 pointer-events-none"
         >
-          <div className="flex items-center gap-3">
-            <span className="bg-white/20 p-2 rounded-full">
-              <ShoppingCart size={20} />
-            </span>
-            <span className="font-semibold">
-              {cartCount} {cartCount > 1 ? 'items' : 'item'} in cart
-            </span>
+          <div className="max-w-4xl mx-auto pointer-events-auto">
+            <Link to="/cart">
+              <div className="bg-slate-900/90 backdrop-blur-md text-white rounded-2xl p-4 shadow-2xl shadow-slate-900/20 flex items-center justify-between group hover:scale-[1.02] transition-transform duration-200">
+                <div className="flex items-center gap-4">
+                  <div className="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center font-bold">
+                    {itemCount}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-slate-300 uppercase tracking-wider font-bold">Total</span>
+                    <span className="font-bold text-lg">₹{totalAmount}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 font-medium group-hover:translate-x-1 transition-transform">
+                  <span>View Cart</span>
+                  <ChevronRight size={20} />
+                </div>
+              </div>
+            </Link>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="font-bold text-lg">
-              ${cartTotal.toFixed(2)}
-            </span>
-            <span className="font-semibold">View Cart &rarr;</span>
-          </div>
-        </Link>
-      </div>
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

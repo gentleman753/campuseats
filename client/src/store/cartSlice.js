@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import toast from 'react-hot-toast';
 
 // Function to load the cart state from localStorage
 const loadCartFromStorage = () => {
@@ -47,32 +46,31 @@ const cartSlice = createSlice({
       } else {
         state.cartItems.push({ ...item, quantity: 1 });
       }
-      
-      toast.success(`${item.name} added to cart`);
+
       saveCartToStorage(state.cartItems, state.canteen);
     },
-    
+
     removeFromCart: (state, action) => {
       const itemId = action.payload;
       state.cartItems = state.cartItems.filter((i) => i._id !== itemId);
-      
+
       if (state.cartItems.length === 0) {
         state.canteen = null;
       }
       saveCartToStorage(state.cartItems, state.canteen);
     },
-    
+
     updateQuantity: (state, action) => {
       const { itemId, quantity } = action.payload;
       const newQty = Math.max(1, quantity); // Ensure quantity is at least 1
-      
+
       const itemToUpdate = state.cartItems.find((i) => i._id === itemId);
       if (itemToUpdate) {
         itemToUpdate.quantity = newQty;
       }
       saveCartToStorage(state.cartItems, state.canteen);
     },
-    
+
     clearCart: (state) => {
       state.cartItems = [];
       state.canteen = null;
