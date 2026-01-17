@@ -14,6 +14,7 @@ Built using the **MERN stack** with a seamless real-time experience through **sh
 - Tailwind CSS  
 - Axios  
 - Vite
+- Framer Motion
 
 ### **Backend**
 - Node.js  
@@ -233,3 +234,25 @@ For production → prefer httpOnly cookies to avoid XSS risks.
 - `GET /admin/stats`
 - `POST /admin/canteens`
 - `POST /admin/users/manager`
+
+---
+
+## 🚀 Deployment
+
+### **Backend (Render)**
+1.  Connect your repository to Render.
+2.  Select **Web Service** and choose the `server` directory as Root Directory (if deploying from monorepo).
+3.  Set the **Build Command**: `npm install`
+4.  Set the **Start Command**: `npm start`
+5.  Add Environment Variables:
+    -   `MONGO_URI`: Your MongoDB Atlas connection string.
+    -   `JWT_SECRET`: A strong secret key.
+    -   `CORS_ORIGIN`: Your deployed Frontend URL (e.g., `https://campuseats-client.vercel.app`).
+    -   `NODE_ENV`: `production`
+
+### **Frontend (Vercel)**
+1.  Connect your repository to Vercel.
+2.  Set the **Root Directory** to `client`.
+3.  Vercel will auto-detect Vite.
+4.  Add Environment Variables:
+    -   `VITE_API_URL`: Your deployed Backend URL (e.g., `https://campuseats-server.onrender.com`).
